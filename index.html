@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>test</title>
+</head>
+<body>
+    <h1>test</h1>
+    
+    <h2>Аунтефикация</h2>
+    <form id="loginForm" method="POST">
+        <label for="username">Логин:</label><br>
+        <input type="text" id="username" name="username"><br>
+        <label for="password">Пароль:</label><br>
+        <input type="password" id="password" name="password"><br><br>
+        <button type="submit">Войти</button>
+    </form>
+
+    <h2>Регистрация</h2>
+    <form id="registerForm" method="POST">
+        <button type="submit">Регистрация</button>
+    </form>
+
+    <h2>Лист пиццы</h2>
+    <button id="getPizzasBtn">Узнать</button>
+    <div id="pizzas"></div>
+
+    <h2>Пицца по id</h2>
+    <form id="getPizzaForm">
+        <label for="pizzaId">Номер пиццы:</label><br>
+        <input type="number" id="pizzaId" name="pizzaId"><br><br>
+        <button type="submit">Узнать</button>
+    </form>
+    <div id="pizza"></div>
+
+    <h2>zakaz</h2>
+    <form id="orderForm">
+        <label for="orderPizzaId">Номер пиццы:</label><br>
+        <input type="number" id="orderPizzaId" name="orderPizzaId"><br>
+        <label for="quantity">Количество:</label><br>
+        <input type="number" id="quantity" name="quantity"><br><br>
+        <button type="submit">Оставить заказ</button>
+    </form>
+    <div id="order"></div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch('/register_or_login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(Object.fromEntries(formData))
+            });
+            const result = await response.json();
+            alert(result.message);
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const response = await fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            });
+            const result = await response.json();
+            alert('Generated username: ' + result.username + '\nGenerated password: ' + result.password);
+        });
+
+        document.getElementById('getPizzasBtn').addEventListener('click', async function() {
+            const response = await fetch('/pizzas');
+            const pizzas = await response.json();
+            document.getElementById('pizzas').innerHTML = JSON.stringify(pizzas);
+        });
+
+        document.getElementById('getPizzaForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const pizzaId = document.getElementById('pizzaId').value;
+            const response = await fetch(`/pizza/${pizzaId}`);
+            const pizza = await response.json();
+            document.getElementById('pizza').innerHTML = JSON.stringify(pizza);
+        });
+
+        document.getElementById('orderForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch('/order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(Object.fromEntries(formData))
+            });
+            const result = await response.json();
+            alert(result.message);
+        });
+    </script>
+</body>
+</html>
